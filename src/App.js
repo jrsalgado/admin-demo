@@ -37,11 +37,11 @@ class App extends Component {
   _fetchData() {
     const _this = this
     superagent
-    // .get(process.env.REACT_APP_API_URL+'/vote/?kittenId=' + kittenId)
-    .get('http://test01-externalloa-zsbljwn53rge-1833574909.us-west-1.elb.amazonaws.com:3100/results')
-    .end(function (err, {body}) {
-      if (err) return console.log(err)
-      _this.setState({ data: body })
+    // .get('http://test01-externalloa-zsbljwn53rge-1833574909.us-west-1.elb.amazonaws.com:3100/results')
+    .get(process.env.REACT_APP_API_URL+'/results')
+    .end(function (err, response) {
+      if (err || !response) return console.log(err)
+      _this.setState({ data: response.body })
     });
   }
 
@@ -68,7 +68,20 @@ class App extends Component {
             "children": this._shuffleData(this._formatData(this.state.data))
           }}
           /> :
-          <div>there is no data</div>
+          <div style={{
+            width: '50%',
+            height: '50%',
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
+            background: 'url("https://media.giphy.com/media/7NoNw4pMNTvgc/giphy.gif") no-repeat local center',
+            backgroundSize: 'cover',
+            color:'white'
+          }}>
+            <h1>  No votes yet </h1>
+            <p> ...or maybe you broke something'</p>
+          </div>
         }
       </div>
     );
