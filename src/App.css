@@ -1,3 +1,7 @@
+html, body, #root, #root>div{
+  width: 100%;
+  height: 100%;
+}
 .App {
   text-align: center;
 }
@@ -33,7 +37,7 @@
 .rv-treemap__leaf {
   overflow: hidden;
   position: absolute;
-  background: transparent!
+  background: transparent !important;
 }
 
 .rv-treemap__leaf--circle {
@@ -47,5 +51,5 @@
   overflow: hidden;
   padding: 10px;
   text-overflow: ellipsis;
-  /*height: 100%;*/
+  height: 100%;
 }

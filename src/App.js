@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Treemap } from 'react-vis';
 // import 'react-vis/dist/styles/examples.scss';
@@ -7,18 +6,30 @@ import { Treemap } from 'react-vis';
 // import 'react-vis/dist/styles/legends.scss';
 // import 'react-vis/dist/styles/radial-chart.scss';
 // import 'react-vis/dist/styles/treemap.scss';
-
 class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      mode: 'squarify'
+    }
+  }
+  componentDidMount() {
+    const _this = this
+    const modes = ['squarify', 'resquarify', 'slice', 'dice', 'slicedice', 'binary', 'partition', 'partition-pivot']
+    setInterval(() => {
+      _this.setState({ mode: modes[Math.floor(Math.random()*modes.length)] })
+    },5000)
+  }
   render() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Treemap
           title={'My New Treemap'}
-          width={600}
-          height={600}
+          width={window.innerWidth}
+          height={window.innerHeight}
           animation={true}
-          mode={'squarify'}
-          padding={4}
+          mode={this.state.mode}
+          padding={1}
           data={{
             "title": "analytics",
             "color": "#12939A",
@@ -26,10 +37,10 @@ class App extends Component {
               {
                 "title": "clus",
                 "children": [
-                  { "title": <Title votes={1} />, "color": "#12939A", "size": 1 },
-                  { "title": "CommunityStructure", "color": "#12939A", "size": 2 },
-                  { "title": "HierarchicalCluster", "color": "#12939A", "size": 3 },
-                  { "title": "MergeEdge", "color": "#12939A", "size": 4 }
+                  { "title": <Title votes={4} />, "color": "#12939A", "size": 4 },
+                  { "title": <Title votes={2} />, "color": "#12939A", "size": 2 },
+                  { "title": <Title votes={3} />, "color": "#12939A", "size": 3 },
+                  { "title": <Title votes={4} />, "color": "#12939A", "size": 4 }
                 ]
               }
             ]
@@ -44,12 +55,15 @@ const Title = ({ votes }) =>
   <div style={{
     width: '100%',
     height: '100%',
-    background: 'red',
+    background: 'white',
+    color: 'black',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: 'blue'
   }}>
     <h1>{votes}</h1>
   </div>
+
 export default App;
 
