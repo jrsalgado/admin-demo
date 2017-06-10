@@ -1,28 +1,62 @@
 import React, { Component } from 'react';
-import './App.css';
 import { Treemap } from 'react-vis';
-// import 'react-vis/dist/styles/examples.scss';
-// import 'react-vis/dist/styles/plot.scss';
-// import 'react-vis/dist/styles/legends.scss';
-// import 'react-vis/dist/styles/radial-chart.scss';
-// import 'react-vis/dist/styles/treemap.scss';
+import _ from 'lodash';
+import superagent from 'superagent';
+import './App.css';
+
+const modes = ['squarify', 'resquarify', 'binary'];
+
+const giphy = {
+  start:'https://media.giphy.com/media/',
+  end: '/giphy.gif',
+  getId: (src) => src.replace(giphy.start,'').replace(giphy.end,''),
+  getURL: (id) => giphy.start + id + giphy.end
+}
+
 class App extends Component {
   constructor() {
     super()
     this.state = {
-      mode: 'squarify'
+      mode: modes[Math.floor(Math.random() * modes.length)],
+      data: []
     }
+
+    this._fetchData = this._fetchData.bind(this)
+    this._fetchData()
+    setInterval(this._fetchData,1000*10)
   }
+
   componentDidMount() {
     const _this = this
-    const modes = ['squarify', 'resquarify', 'slice', 'dice', 'slicedice', 'binary', 'partition', 'partition-pivot']
     setInterval(() => {
-      _this.setState({ mode: modes[Math.floor(Math.random()*modes.length)] })
-    },5000)
+      let mode = modes[Math.floor(Math.random() * modes.length)]
+      _this.setState({ mode })
+    }, 5000)
   }
+
+  _fetchData() {
+    const _this = this
+    superagent
+    // .get(process.env.REACT_APP_API_URL+'/vote/?kittenId=' + kittenId)
+    .get('http://test01-externalloa-zsbljwn53rge-1833574909.us-west-1.elb.amazonaws.com:3100/results')
+    .end(function (err, {body}) {
+      if (err) return console.log(err)
+      _this.setState({ data: body })
+    });
+  }
+
+  _shuffleData(a) {
+    return _.shuffle(a)
+  }
+
+  _formatData(data) {
+    return _.map(data, o => ({ "title": <Title votes={o.votes} kittenId={o.kittenId} />, "size": o.votes }))
+  }
+
   render() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {this.state.data.length ?
         <Treemap
           title={'My New Treemap'}
           width={window.innerWidth}
@@ -31,38 +65,32 @@ class App extends Component {
           mode={this.state.mode}
           padding={1}
           data={{
-            "title": "analytics",
-            "color": "#12939A",
-            "children": [
-              {
-                "title": "clus",
-                "children": [
-                  { "title": <Title votes={4} />, "color": "#12939A", "size": 4 },
-                  { "title": <Title votes={2} />, "color": "#12939A", "size": 2 },
-                  { "title": <Title votes={3} />, "color": "#12939A", "size": 3 },
-                  { "title": <Title votes={4} />, "color": "#12939A", "size": 4 }
-                ]
-              }
-            ]
+            "children": this._shuffleData(this._formatData(this.state.data))
           }}
-        />
+          /> :
+          <div>there is no data</div>
+        }
       </div>
     );
   }
 }
 
-const Title = ({ votes }) =>
+// background: 'url("' + giphy.getURL(kittenId) + '") no-repeat local center',
+const Title = ({ votes, kittenId }) =>
   <div style={{
     width: '100%',
     height: '100%',
-    background: 'white',
-    color: 'black',
+    color: 'white',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'blue'
+    flexDirection: 'column',
+    background: 'url("http://s3.amazonaws.com/giphygifs/media/' + kittenId + '/200w_s.gif") no-repeat local center',
+    backgroundSize: 'cover',
+    textShadow: '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black',
   }}>
-    <h1>{votes}</h1>
+    <span style={{ fontSize:'xx-large' }} >{votes}</span>
+    <span style={{ fontSize:'12px' }} >{kittenId}</span>
   </div>
 
 export default App;
